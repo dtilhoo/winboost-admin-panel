@@ -1,0 +1,24 @@
+import 'package:get_it/get_it.dart';
+import '../data/repositories/admin_repository.dart';
+import '../domain/usecases/admin_usecases.dart';
+
+final getIt = GetIt.instance;
+
+Future<void> setupInjection() async {
+  // Repositories
+  getIt.registerLazySingleton(() => AdminRepository());
+
+  // UseCases
+  getIt.registerLazySingleton(() => GetDashboardMetricsUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetRoleApprovalsUseCase(getIt()));
+  getIt.registerLazySingleton(() => ManageWalletUseCase(getIt()));
+  getIt.registerLazySingleton(() => ManageCategoryUseCase(getIt()));
+  getIt.registerLazySingleton(() => ManageMerchantProfileUseCase(getIt()));
+  getIt.registerLazySingleton(() => ManagePartnershipsUseCase(getIt()));
+  getIt.registerLazySingleton(() => ManageMessagesUseCase(getIt()));
+  getIt.registerLazySingleton(() => ManageCountersUseCase(getIt()));
+  getIt.registerLazySingleton(() => ManageNotificationsUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetLogsUseCase(getIt()));
+
+  // New usecases to add later can be registered here
+}
