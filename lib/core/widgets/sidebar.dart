@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/auth/cubit/auth_cubit.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
@@ -133,7 +135,7 @@ class Sidebar extends StatelessWidget {
               ],
             ),
           ),
-          _buildFooter(),
+          _buildFooter(context),
         ],
       ),
     );
@@ -195,7 +197,7 @@ class Sidebar extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 12, bottom: 16, left: 14, right: 14),
       decoration: const BoxDecoration(
@@ -207,6 +209,37 @@ class Sidebar extends StatelessWidget {
           _FooterPill(text: '🟢 DEV • INFO/ERROR logs'),
           const SizedBox(height: 10),
           _FooterPill(text: '🛡️ Manual payouts • No gateway'),
+          const SizedBox(height: 16),
+          InkWell(
+            onTap: () {
+              context.read<AuthCubit>().logout();
+            },
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0x1EEF4444)),
+                color: const Color(0x0AEF4444),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.logout, size: 16, color: AppColors.danger),
+                  SizedBox(width: 8),
+                  Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: AppColors.danger,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

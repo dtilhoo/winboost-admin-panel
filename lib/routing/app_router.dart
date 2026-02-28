@@ -13,7 +13,12 @@ import '../features/merchant_counters/merchant_counters_view.dart';
 import '../features/in_app_notifications/in_app_notifications_view.dart';
 import '../features/audit_logs/audit_logs_view.dart';
 import '../features/settings/settings_view.dart';
+import '../features/auth/login_view.dart';
+import '../features/auth/cubit/auth_cubit.dart';
 import '../core/widgets/sidebar.dart';
+import '../core/theme/app_colors.dart';
+import '../injection/injection.dart';
+import 'dart:async';
 
 // Create a GlobalKey for the root Navigator
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
@@ -22,6 +27,21 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
 final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'shell',
 );
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+      (dynamic _) => notifyListeners(),
+    );
+  }
+  late final StreamSubscription<dynamic> _subscription;
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
 
 CustomTransitionPage buildPageWithDefaultTransition<T>({
   required BuildContext context,
@@ -40,19 +60,54 @@ CustomTransitionPage buildPageWithDefaultTransition<T>({
 final goRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: '/',
+  refreshListenable: GoRouterRefreshStream(getIt<AuthCubit>().stream),
+  redirect: (context, state) {
+    final authState = getIt<AuthCubit>().state;
+    final isLoggingIn = state.matchedLocation == '/login';
+
+    if (authState is Unauthenticated && !isLoggingIn) {
+      return '/login';
+    }
+    if (authState is Authenticated && isLoggingIn) {
+      return '/';
+    }
+    return null;
+  },
   routes: [
+    GoRoute(path: '/login', builder: (context, state) => const LoginView()),
     ShellRoute(
       navigatorKey: shellNavigatorKey,
       builder: (context, state, child) {
-        return Scaffold(
-          body: Row(
-            children: [
-              const Sidebar(),
-              Expanded(
-                child: Column(children: [Expanded(child: child)]),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final isMobile = constraints.maxWidth < 800;
+            return Scaffold(
+              appBar: isMobile
+                  ? AppBar(
+                      title: const Text(
+                        'WinBoost Admin',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      backgroundColor: AppColors.panel,
+                      scrolledUnderElevation: 0,
+                    )
+                  : null,
+              drawer: isMobile
+                  ? const Drawer(child: SafeArea(child: Sidebar()))
+                  : null,
+              body: Row(
+                children: [
+                  if (!isMobile) const Sidebar(),
+                  Expanded(
+                    child: Column(children: [Expanded(child: child)]),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
       routes: [

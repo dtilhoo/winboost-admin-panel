@@ -84,7 +84,7 @@ class _PartnershipsContentState extends State<_PartnershipsContent> {
           DrawerShell(
             isOpen: _isDrawerOpen,
             title: 'Partnership Detail',
-            subtitle: _selectedItem != null ? '${_selectedItem!.id}' : '—',
+            subtitle: _selectedItem != null ? _selectedItem!.id : '—',
             onClose: _closeDrawer,
             body: _buildDrawerBody(),
             actions: _buildDrawerActions(context),

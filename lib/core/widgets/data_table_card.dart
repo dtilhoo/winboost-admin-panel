@@ -71,7 +71,7 @@ class DataTableCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (filtersRow != null) filtersRow!,
+                ?filtersRow,
               ],
             ),
           ),
@@ -90,7 +90,7 @@ class DataTableCard extends StatelessWidget {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
-                headingRowColor: MaterialStateProperty.all(
+                headingRowColor: WidgetStateProperty.all(
                   const Color(0x08FFFFFF),
                 ), // rgba(255,255,255,.03)
                 dataRowMinHeight: 48,
