@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WinBoost – Admin Panel Prototype</title>
+<style>
+  :root{
+    --bg:#0B1220;
+    --panel:#0F172A;
+    --text:#E7EEF9;
+    --muted:#9FB0CE;
+    --line:rgba(255,255,255,.10);
+    --brand:#00C853;
+    --brand2:#18D36A;
+    --danger:#EF4444;
+    --warn:#F59E0B;
+    --info:#3B82F6;
+    --ok:#22C55E;
+    --shadow: 0 18px 40px rgba(0,0,0,.35);
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    background: radial-gradient(1200px 900px at 20% -10%, rgba(0,200,83,.20), transparent 50%),
+                radial-gradient(900px 600px at 90% 0%, rgba(59,130,246,.18), transparent 55%),
+                var(--bg);
+    color:var(--text);
+  }
+  .app{display:flex; min-height:100vh}
+  .side{
+    width:280px;
+    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border-right:1px solid var(--line);
+    padding:16px 14px;
+    position:sticky; top:0; height:100vh;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 10px 14px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:10px;
+  }
+  .logo{
+    width:40px;height:40px;border-radius:14px;
+    background: linear-gradient(135deg, rgba(0,200,83,.35), rgba(24,211,106,.18));
+    border:1px solid rgba(0,200,83,.25);
+    display:grid; place-items:center;
+    font-weight:900;
+    color:var(--brand);
+  }
+  .brand .t{font-weight:900; letter-spacing:.2px}
+  .brand .s{font-size:12px;color:var(--muted); margin-top:2px}
+  .menu{margin-top:10px}
+  .mi{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 10px;
+    border-radius:14px;
+    cursor:pointer;
+    color:var(--muted);
+    font-weight:800;
+    user-select:none;
+  }
+  .mi:hover{background:rgba(255,255,255,.04); color:var(--text)}
+  .mi.active{
+    background:rgba(0,200,83,.12);
+    border:1px solid rgba(0,200,83,.18);
+    color:var(--text);
+  }
+  .ico{
+    width:34px;height:34px;border-radius:12px;
+    background:rgba(255,255,255,.05);
+    display:grid; place-items:center;
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .mi.active .ico{
+    background:rgba(0,200,83,.18);
+    border-color:rgba(0,200,83,.22);
+    color:var(--brand2);
+  }
+  .sideFooter{
+    position:absolute; left:14px; right:14px; bottom:16px;
+    border-top:1px solid var(--line);
+    padding-top:12px;
+  }
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 10px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    font-size:12px; color:var(--muted);
+    font-weight:900;
+  }
+
+  .main{flex:1; padding:18px 18px 60px}
+  .top{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:14px;
+  }
+  .title{
+    font-size:20px; font-weight:1000; letter-spacing:-.01em;
+  }
+  .subtitle{font-size:13px; color:var(--muted); margin-top:4px}
+  .search{
+    flex:1; max-width:520px;
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+  }
+  .search input{
+    width:100%; border:0; outline:0; background:transparent; color:var(--text);
+    font-size:13px;
+  }
+  .topRight{display:flex; align-items:center; gap:10px}
+  .btn{
+    border:0; cursor:pointer; user-select:none;
+    background:linear-gradient(135deg, var(--brand), #14B85B);
+    color:#06250f;
+    padding:10px 12px; border-radius:14px;
+    font-weight:1000; font-size:13px;
+    box-shadow: 0 14px 26px rgba(0,200,83,.18);
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn.secondary{
+    background:rgba(255,255,255,.05);
+    color:var(--text);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:none;
+  }
+  .btn.danger{
+    background:linear-gradient(135deg, rgba(239,68,68,1), rgba(239,68,68,.75));
+    color:white;
+    box-shadow: 0 14px 26px rgba(239,68,68,.18);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap:14px;
+  }
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:var(--r);
+    box-shadow: var(--shadow);
+    padding:14px;
+  }
+  .kpi{
+    grid-column: span 3;
+    padding:14px;
+  }
+  .kpi .l{font-size:11px; color:var(--muted); font-weight:1000; letter-spacing:.12em; text-transform:uppercase}
+  .kpi .v{font-size:22px; font-weight:1100; margin-top:8px}
+  .kpi .h{font-size:12px; color:var(--muted); margin-top:6px}
+  .tableCard{grid-column: span 12; padding:0; overflow:hidden}
+  .tableHead{
+    padding:14px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .tableHead .left{display:flex; flex-direction:column; gap:3px}
+  .tableHead .left .t{font-weight:1100}
+  .tableHead .left .s{font-size:12px; color:var(--muted)}
+  .filters{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .select, .input{
+    padding:9px 10px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    font-weight:900;
+    font-size:12px;
+    outline:none;
+  }
+  .table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  .table thead th{
+    text-align:left;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-weight:1100;
+    padding:12px 14px;
+    background:rgba(255,255,255,.03);
+    border-bottom:1px solid rgba(255,255,255,.10);
+  }
+  .table tbody td{
+    padding:12px 14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    font-size:13px;
+    color:var(--text);
+    vertical-align:top;
+  }
+  .table tbody tr:hover{background:rgba(255,255,255,.03)}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    font-size:12px; font-weight:1000;
+    white-space:nowrap;
+  }
+  .chip.ok{background:rgba(34,197,94,.14); border-color:rgba(34,197,94,.20); color:#B6F7C9}
+  .chip.warn{background:rgba(245,158,11,.14); border-color:rgba(245,158,11,.20); color:#FFE3B0}
+  .chip.bad{background:rgba(239,68,68,.16); border-color:rgba(239,68,68,.22); color:#FFD2D2}
+  .chip.info{background:rgba(59,130,246,.16); border-color:rgba(59,130,246,.22); color:#CFE3FF}
+  .actions{display:flex; gap:8px; align-items:center}
+  .iconBtn{
+    width:34px;height:34px;border-radius:12px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    cursor:pointer;
+    display:grid; place-items:center;
+    user-select:none;
+  }
+  .iconBtn:hover{background:rgba(255,255,255,.06)}
+  .drawer{
+    position:fixed; top:0; right:-520px; width:520px; height:100vh;
+    background:linear-gradient(180deg, rgba(16,29,58,.98), rgba(15,26,51,.98));
+    border-left:1px solid rgba(255,255,255,.10);
+    box-shadow: -20px 0 50px rgba(0,0,0,.35);
+    transition:right .25s ease;
+    z-index:20;
+    display:flex;
+    flex-direction:column;
+  }
+  .drawer.open{right:0}
+  .drawerTop{
+    padding:14px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+  }
+  .drawerTitle{font-weight:1100}
+  .drawerSub{font-size:12px; color:var(--muted); margin-top:4px}
+  .drawerBody{padding:14px; overflow:auto}
+  .kv{display:grid; grid-template-columns: 140px 1fr; gap:8px 12px; margin-top:10px}
+  .k{color:var(--muted); font-size:12px; font-weight:1000}
+  .v{color:var(--text); font-size:13px; font-weight:900}
+  .sep{height:1px; background:rgba(255,255,255,.10); margin:14px 0}
+  .note{
+    width:100%;
+    min-height:90px;
+    resize:vertical;
+    padding:10px 10px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    font-weight:700;
+    outline:none;
+  }
+  .drawerActions{padding:14px; border-top:1px solid rgba(255,255,255,.10); display:flex; gap:10px; flex-wrap:wrap}
+  .toast{
+    position:fixed; left:50%; transform:translateX(-50%);
+    bottom:18px;
+    background:rgba(15,23,42,.95);
+    border:1px solid rgba(255,255,255,.10);
+    padding:10px 12px;
+    border-radius:999px;
+    font-size:12px; font-weight:1000;
+    color:var(--text);
+    opacity:0; pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:30;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px)}
+  @media (max-width: 980px){
+    .side{display:none}
+    .main{padding:14px}
+    .drawer{width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">WB</div>
+      <div>
+        <div class="t">WinBoost Admin</div>
+        <div class="s">MVP operations console</div>
+      </div>
+    </div>
+    <div class="menu" id="menu"></div>
+    <div class="sideFooter">
+      <div class="pill">🟢 DEV • INFO/ERROR logs</div>
+      <div style="height:10px"></div>
+      <div class="pill">🛡️ Manual payouts • No gateway</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div>
+        <div class="title" id="pageTitle">Dashboard</div>
+        <div class="subtitle" id="pageSub">High-level operational KPIs</div>
+      </div>
+      <div class="search">
+        🔎 <input id="globalSearch" placeholder="Search by merchant, creator, reference, transaction id…" />
+      </div>
+      <div class="topRight">
+        <button class="btn secondary" onclick="openDrawer({type:'help'})">📘 SOP</button>
+        <button class="btn" onclick="toast('Export queued (prototype)')">⬇️ Export</button>
+      </div>
+    </div>
+    <div id="page"></div>
+  </main>
+</div>
+
+<div class="drawer" id="drawer">
+  <div class="drawerTop">
+    <div>
+      <div class="drawerTitle" id="drawerTitle">Detail</div>
+      <div class="drawerSub" id="drawerSub">—</div>
+    </div>
+    <div class="iconBtn" onclick="closeDrawer()" title="Close">✕</div>
+  </div>
+  <div class="drawerBody" id="drawerBody"></div>
+  <div class="drawerActions" id="drawerActions"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const state = {
+  page: "dash",
+  drawer: { open:false, item:null },
+  data: {
+    merchants: [
+      {id:"M-UG-001", name:"Urban Grind Coffee", owner:"D. Patel", created:"2026-02-05", badge:"B", status:"Active"},
+      {id:"M-FM-014", name:"FreshMart", owner:"A. Nundlall", created:"2026-02-09", badge:"A", status:"Active"},
+      {id:"M-FL-007", name:"FitLab Gym", owner:"S. R.", created:"2026-02-11", badge:"C", status:"Suspended"},
+    ],
+    merchantApps: [
+      {id:"MA-102", merchant:"Urban Grind Coffee", email:"owner@urbangrind.mu", submitted:"2026-02-05", status:"Pending", docs:"OK"},
+      {id:"MA-117", merchant:"FitLab Gym", email:"admin@fitlab.mu", submitted:"2026-02-11", status:"Rejected", docs:"Missing BRN"},
+      {id:"MA-121", merchant:"GreenLeaf Pharmacy", email:"ops@greenleaf.mu", submitted:"2026-02-12", status:"Pending", docs:"OK"},
+    ],
+    creatorApps: [
+      {id:"CA-88", creator:"Alex Doe (@alex.mu)", submitted:"2026-02-08", status:"Pending", social:"25k IG"},
+      {id:"CA-92", creator:"Mia D. (@mia.d)", submitted:"2026-02-10", status:"Approved", social:"12k IG"},
+      {id:"CA-95", creator:"Jay K. (@jayk)", submitted:"2026-02-12", status:"Rejected", social:"Low proof"},
+    ],
+    topups: [
+      {id:"TU-1029", merchant:"Urban Grind Coffee", amount:10000, ref:"WB-TU-1029", submitted:"2026-02-13", status:"Pending", proof:true},
+      {id:"TU-1021", merchant:"Urban Grind Coffee", amount:5000, ref:"WB-TU-1021", submitted:"2026-02-10", status:"Confirmed", proof:true},
+      {id:"TU-1033", merchant:"FreshMart", amount:15000, ref:"WB-TU-1033", submitted:"2026-02-14", status:"Rejected", proof:true},
+    ],
+    refunds: [
+      {id:"RF-54", merchant:"Urban Grind Coffee", amount:3000, reason:"Reduce deposit", submitted:"2026-02-13", status:"Pending"},
+      {id:"RF-49", merchant:"FitLab Gym", amount:5000, reason:"Close campaign", submitted:"2026-02-09", status:"Paid"},
+    ],
+    merchantWithdrawals: [
+      {id:"MW-14", merchant:"FreshMart", amount:8000, submitted:"2026-02-12", status:"Pending"},
+      {id:"MW-11", merchant:"Urban Grind Coffee", amount:4000, submitted:"2026-02-10", status:"Approved"},
+      {id:"MW-07", merchant:"FitLab Gym", amount:2500, submitted:"2026-02-08", status:"Rejected"},
+    ],
+    creatorWithdrawals: [
+      {id:"CW-22", creator:"Alex Doe", amount:1500, submitted:"2026-02-14", status:"Pending"},
+      {id:"CW-19", creator:"Mia D.", amount:900, submitted:"2026-02-11", status:"Paid"},
+      {id:"CW-15", creator:"Jay K.", amount:500, submitted:"2026-02-09", status:"Rejected"},
+    ],
+    notifications: [
+      {id:"N-301", title:"Top-up pending", channel:"In-app + Push", audience:"Merchant", created:"2026-02-13", status:"Sent"},
+      {id:"N-297", title:"Creator approved", channel:"In-app + Push", audience:"Influencer", created:"2026-02-10", status:"Sent"},
+    ],
+    logs: [
+      {t:"2026-02-14 12:03", level:"INFO", msg:"QR_CLAIM_SUCCESS tx=WBX-UG-83912 wins=150"},
+      {t:"2026-02-14 12:15", level:"ERROR", msg:"TOPUP_CONFIRM_FAIL TU-1033 reason=bank_ref_mismatch"},
+      {t:"2026-02-14 12:20", level:"INFO", msg:"WITHDRAW_REQUEST_CREATED CW-22 amount=1500"},
+    ]
+  }
+};
+
+const $ = s => document.querySelector(s);
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1400);
+}
+function chip(text, kind){
+  const cls = kind ? `chip ${kind}` : "chip";
+  return `<span class="${cls}">${text}</span>`;
+}
+function statusKind(status){
+  const s = (status||"").toLowerCase();
+  if(["approved","confirmed","paid","active","sent"].includes(s)) return "ok";
+  if(["pending"].includes(s)) return "warn";
+  if(["rejected","failed","suspended"].includes(s)) return "bad";
+  return "info";
+}
+function money(n){ return "Rs " + (n||0).toLocaleString(); }
+function tr(cells){ return `<tr>${cells.map(c=>`<td>${c}</td>`).join("")}</tr>`; }
+function kpi(label, value, hint){
+  return `<div class="l">${label}</div><div class="v">${value}</div><div class="h">${hint||""}</div>`;
+}
+function tableCard({title, subtitle, cols, rows, filtersHtml=""}){
+  return `
+    <div class="card tableCard">
+      <div class="tableHead">
+        <div class="left">
+          <div class="t">${title}</div>
+          <div class="s">${subtitle||""}</div>
+        </div>
+        <div class="filters">${filtersHtml}</div>
+      </div>
+      <table class="table">
+        <thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead>
+        <tbody>${rows.join("")}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* Drawer */
+function buildDetailKV(obj){
+  const keys = Object.keys(obj);
+  return `<div class="kv">${keys.map(k=>`<div class="k">${k}</div><div class="v">${obj[k]}</div>`).join("")}</div>`;
+}
+function buildActions(buttons){
+  return buttons.map(b => `<button class="btn ${b.kind||'secondary'}" onclick="${b.onClick}">${b.label}</button>`).join("");
+}
+function openDrawer(item){
+  $("#drawer").classList.add("open");
+  if(item.type==="help"){
+    $("#drawerTitle").textContent = "SOP / Operations";
+    $("#drawerSub").textContent = "Manual flows (MVP)";
+    $("#drawerBody").innerHTML = `
+      <div class="card" style="box-shadow:none; background:rgba(255,255,255,.03); border-color:rgba(255,255,255,.08)">
+        <div style="font-weight:1100">Wallet top-up</div>
+        <div style="color:var(--muted); font-size:13px; margin-top:6px; line-height:1.5">
+          Pending → Confirmed (credits wallet) OR Rejected (no ledger impact).
+        </div>
+        <div class="sep"></div>
+        <div style="font-weight:1100">Withdrawals</div>
+        <div style="color:var(--muted); font-size:13px; margin-top:6px; line-height:1.5">
+          Pending → Approved → Paid / Rejected.
+        </div>
+        <div class="sep"></div>
+        <div style="font-weight:1100">Rounding</div>
+        <div style="color:var(--muted); font-size:13px; margin-top:6px; line-height:1.5">
+          ROUND_HALF_UP • money 2 decimals • points whole numbers.
+        </div>
+      </div>
+    `;
+    $("#drawerActions").innerHTML = `<button class="btn secondary" onclick="closeDrawer()">Close</button>`;
+    return;
+  }
+  $("#drawerTitle").textContent = item.title || "Detail";
+  $("#drawerSub").textContent = item.sub || "—";
+  $("#drawerBody").innerHTML = item.body || "";
+  $("#drawerActions").innerHTML = item.actions || `<button class="btn secondary" onclick="closeDrawer()">Close</button>`;
+}
+function closeDrawer(){ $("#drawer").classList.remove("open"); }
+
+/* Mutations */
+function quickApprove(type, id){
+  if(type==="merchant"){ state.data.merchantApps.find(x=>x.id===id).status="Approved"; }
+  else{ state.data.creatorApps.find(x=>x.id===id).status="Approved"; }
+  toast("Approved"); closeDrawer(); render();
+}
+function quickReject(type, id){
+  if(type==="merchant"){ state.data.merchantApps.find(x=>x.id===id).status="Rejected"; }
+  else{ state.data.creatorApps.find(x=>x.id===id).status="Rejected"; }
+  toast("Rejected"); closeDrawer(); render();
+}
+function confirmTopup(id){ state.data.topups.find(x=>x.id===id).status="Confirmed"; toast("Top-up confirmed"); closeDrawer(); render(); }
+function rejectTopup(id){ state.data.topups.find(x=>x.id===id).status="Rejected"; toast("Top-up rejected"); closeDrawer(); render(); }
+function approveRefund(id){ state.data.refunds.find(x=>x.id===id).status="Approved"; toast("Refund approved"); closeDrawer(); render(); }
+function markRefundPaid(id){ state.data.refunds.find(x=>x.id===id).status="Paid"; toast("Refund paid"); closeDrawer(); render(); }
+function rejectRefund(id){ state.data.refunds.find(x=>x.id===id).status="Rejected"; toast("Refund rejected"); closeDrawer(); render(); }
+function approveWithdraw(kind, id){
+  (kind==="merchant"?state.data.merchantWithdrawals:state.data.creatorWithdrawals).find(x=>x.id===id).status="Approved";
+  toast("Approved"); closeDrawer(); render();
+}
+function markPaid(kind, id){
+  (kind==="merchant"?state.data.merchantWithdrawals:state.data.creatorWithdrawals).find(x=>x.id===id).status="Paid";
+  toast("Paid"); closeDrawer(); render();
+}
+function rejectWithdraw(kind, id){
+  (kind==="merchant"?state.data.merchantWithdrawals:state.data.creatorWithdrawals).find(x=>x.id===id).status="Rejected";
+  toast("Rejected"); closeDrawer(); render();
+}
+
+/* Detail openers */
+function openMerchantApp(id){
+  const a = state.data.merchantApps.find(x=>x.id===id);
+  openDrawer({
+    title:"Merchant application",
+    sub:`${id} • ${a.merchant}`,
+    body: `
+      ${buildDetailKV({
+        "App ID": a.id,
+        "Merchant": a.merchant,
+        "Email": a.email,
+        "Submitted": a.submitted,
+        "Docs": a.docs,
+        "Status": chip(a.status.toUpperCase(), statusKind(a.status))
+      })}
+      <div class="sep"></div>
+      <div style="font-weight:1100">Reviewer notes</div>
+      <textarea class="note" placeholder="Add review notes…"></textarea>
+    `,
+    actions: buildActions([
+      {label:"Approve", kind:"", onClick:`quickApprove('merchant','${id}')`},
+      {label:"Reject", kind:"danger", onClick:`quickReject('merchant','${id}')`},
+      {label:"Close", kind:"secondary", onClick:"closeDrawer()"},
+    ])
+  });
+}
+function openCreatorApp(id){
+  const a = state.data.creatorApps.find(x=>x.id===id);
+  openDrawer({
+    title:"Influencer application",
+    sub:`${id} • ${a.creator}`,
+    body: `
+      ${buildDetailKV({
+        "App ID": a.id,
+        "Creator": a.creator,
+        "Submitted": a.submitted,
+        "Social": a.social,
+        "Status": chip(a.status.toUpperCase(), statusKind(a.status))
+      })}
+      <div class="sep"></div>
+      <div style="font-weight:1100">Reviewer notes</div>
+      <textarea class="note" placeholder="Add review notes…"></textarea>
+    `,
+    actions: buildActions([
+      {label:"Approve", kind:"", onClick:`quickApprove('creator','${id}')`},
+      {label:"Reject", kind:"danger", onClick:`quickReject('creator','${id}')`},
+      {label:"Close", kind:"secondary", onClick:"closeDrawer()"},
+    ])
+  });
+}
+function openTopup(id){
+  const t = state.data.topups.find(x=>x.id===id);
+  openDrawer({
+    title:"Top-up request",
+    sub:`${id} • ${t.merchant}`,
+    body: `
+      ${buildDetailKV({
+        "Top-up ID": t.id,
+        "Merchant": t.merchant,
+        "Amount": money(t.amount),
+        "Reference": t.ref,
+        "Submitted": t.submitted,
+        "Proof": t.proof ? chip("Uploaded","info") : chip("Missing","bad"),
+        "Status": chip(t.status.toUpperCase(), statusKind(t.status))
+      })}
+      <div class="sep"></div>
+      <div style="font-weight:1100">Notes</div>
+      <textarea class="note" placeholder="Mismatch reasons, bank ref, etc…"></textarea>
+    `,
+    actions: buildActions([
+      {label:"Confirm", kind:"", onClick:`confirmTopup('${id}')`},
+      {label:"Reject", kind:"danger", onClick:`rejectTopup('${id}')`},
+      {label:"Close", kind:"secondary", onClick:"closeDrawer()"},
+    ])
+  });
+}
+function openRefund(id){
+  const r = state.data.refunds.find(x=>x.id===id);
+  openDrawer({
+    title:"Refund request",
+    sub:`${id} • ${r.merchant}`,
+    body: `
+      ${buildDetailKV({
+        "Refund ID": r.id,
+        "Merchant": r.merchant,
+        "Amount": money(r.amount),
+        "Reason": r.reason,
+        "Submitted": r.submitted,
+        "Status": chip(r.status.toUpperCase(), statusKind(r.status))
+      })}
+      <div class="sep"></div>
+      <div style="font-weight:1100">Payout reference</div>
+      <textarea class="note" placeholder="Enter bank transfer id…"></textarea>
+    `,
+    actions: buildActions([
+      {label:"Approve", kind:"", onClick:`approveRefund('${id}')`},
+      {label:"Mark Paid", kind:"", onClick:`markRefundPaid('${id}')`},
+      {label:"Reject", kind:"danger", onClick:`rejectRefund('${id}')`},
+      {label:"Close", kind:"secondary", onClick:"closeDrawer()"},
+    ])
+  });
+}
+function openMerchantWithdraw(id){
+  const w = state.data.merchantWithdrawals.find(x=>x.id===id);
+  openDrawer({
+    title:"Merchant withdrawal",
+    sub:`${id} • ${w.merchant}`,
+    body: `
+      ${buildDetailKV({
+        "Request ID": w.id,
+        "Merchant": w.merchant,
+        "Amount": money(w.amount),
+        "Submitted": w.submitted,
+        "Status": chip(w.status.toUpperCase(), statusKind(w.status))
+      })}
+      <div class="sep"></div>
+      <div style="font-weight:1100">Payout reference</div>
+      <textarea class="note" placeholder="Enter bank transfer id…"></textarea>
+    `,
+    actions: buildActions([
+      {label:"Approve", kind:"", onClick:`approveWithdraw('merchant','${id}')`},
+      {label:"Mark Paid", kind:"", onClick:`markPaid('merchant','${id}')`},
+      {label:"Reject", kind:"danger", onClick:`rejectWithdraw('merchant','${id}')`},
+      {label:"Close", kind:"secondary", onClick:"closeDrawer()"},
+    ])
+  });
+}
+function openCreatorWithdraw(id){
+  const w = state.data.creatorWithdrawals.find(x=>x.id===id);
+  openDrawer({
+    title:"Influencer withdrawal",
+    sub:`${id} • ${w.creator}`,
+    body: `
+      ${buildDetailKV({
+        "Request ID": w.id,
+        "Influencer": w.creator,
+        "Amount": money(w.amount),
+        "Submitted": w.submitted,
+        "Status": chip(w.status.toUpperCase(), statusKind(w.status))
+      })}
+      <div class="sep"></div>
+      <div style="font-weight:1100">Payout reference</div>
+      <textarea class="note" placeholder="Enter bank transfer id…"></textarea>
+    `,
+    actions: buildActions([
+      {label:"Approve", kind:"", onClick:`approveWithdraw('creator','${id}')`},
+      {label:"Mark Paid", kind:"", onClick:`markPaid('creator','${id}')`},
+      {label:"Reject", kind:"danger", onClick:`rejectWithdraw('creator','${id}')`},
+      {label:"Close", kind:"secondary", onClick:"closeDrawer()"},
+    ])
+  });
+}
+function openMerchant(id){
+  const m = state.data.merchants.find(x=>x.id===id);
+  openDrawer({
+    title:"Merchant profile",
+    sub:`${id} • ${m.name}`,
+    body: buildDetailKV({
+      "Merchant ID": m.id,
+      "Name": m.name,
+      "Owner": m.owner,
+      "Created": m.created,
+      "Badge": chip("Badge "+m.badge,"info"),
+      "Status": chip(m.status.toUpperCase(), statusKind(m.status))
+    }) + `<div class="sep"></div><div style="font-weight:1100">Notes</div><textarea class="note" placeholder="Internal notes…"></textarea>`,
+    actions: buildActions([
+      {label:"Close", kind:"secondary", onClick:"closeDrawer()"},
+    ])
+  });
+}
+function openNotification(id){
+  const n = state.data.notifications.find(x=>x.id===id);
+  openDrawer({
+    title:"Notification",
+    sub:`${id} • ${n.title}`,
+    body: buildDetailKV({
+      "ID": n.id,
+      "Title": n.title,
+      "Channel": n.channel,
+      "Audience": n.audience,
+      "Created": n.created,
+      "Status": chip(n.status.toUpperCase(), statusKind(n.status))
+    }) + `<div class="sep"></div><div style="font-weight:1100">Body</div><textarea class="note">Your request has been received.</textarea>`,
+    actions: buildActions([
+      {label:"Close", kind:"secondary", onClick:"closeDrawer()"},
+    ])
+  });
+}
+
+/* Pages */
+function pageDash(){
+  const d = state.data;
+  const pendingM = d.merchantApps.filter(x=>x.status==="Pending").length;
+  const pendingC = d.creatorApps.filter(x=>x.status==="Pending").length;
+  const pendingTU = d.topups.filter(x=>x.status==="Pending").length;
+  const pendingW = d.creatorWithdrawals.filter(x=>x.status==="Pending").length + d.merchantWithdrawals.filter(x=>x.status==="Pending").length;
+
+  $("#pageTitle").textContent = "Dashboard";
+  $("#pageSub").textContent = "High-level operational KPIs";
+
+  const rows = [
+    tr(["Top-up pending","TU-1029", money(10000), chip("PENDING","warn"), `<div class="actions"><div class="iconBtn" onclick="openTopup('TU-1029')">👁</div></div>`]),
+    tr(["Creator withdrawal","CW-22", money(1500), chip("PENDING","warn"), `<div class="actions"><div class="iconBtn" onclick="openCreatorWithdraw('CW-22')">👁</div></div>`]),
+    tr(["Merchant application","MA-121", "GreenLeaf Pharmacy", chip("PENDING","warn"), `<div class="actions"><div class="iconBtn" onclick="openMerchantApp('MA-121')">👁</div></div>`]),
+  ];
+  return `
+    <div class="grid">
+      <div class="card kpi">${kpi("Pending Merchant Apps", pendingM, "KYC queue")}</div>
+      <div class="card kpi">${kpi("Pending Creator Apps", pendingC, "Approval queue")}</div>
+      <div class="card kpi">${kpi("Pending Top-Ups", pendingTU, "Proof validation")}</div>
+      <div class="card kpi">${kpi("Pending Withdrawals", pendingW, "Manual payouts")}</div>
+      ${tableCard({title:"Today activity", subtitle:"Items requiring attention", cols:["Event","Ref","Amount","Status",""], rows})}
+    </div>
+  `;
+}
+function pageMerchantApps(){
+  $("#pageTitle").textContent = "Merchant Approvals";
+  $("#pageSub").textContent = "Review merchant KYC submissions";
+  const rows = state.data.merchantApps.map(a => tr([
+    a.id,a.merchant,a.email,a.submitted,
+    chip(a.status.toUpperCase(), statusKind(a.status)),
+    chip(a.docs, a.docs==="OK"?"ok":"warn"),
+    `<div class="actions">
+      <div class="iconBtn" onclick="openMerchantApp('${a.id}')">👁</div>
+      <div class="iconBtn" onclick="quickApprove('merchant','${a.id}')">✅</div>
+      <div class="iconBtn" onclick="quickReject('merchant','${a.id}')">❌</div>
+    </div>`
+  ]));
+  return tableCard({
+    title:"Merchant applications",
+    subtitle:"Pending → Approved / Rejected",
+    cols:["App ID","Merchant","Email","Submitted","Status","Docs","Actions"],
+    rows,
+    filtersHtml:`<select class="select"><option>All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select><input class="input" placeholder="Search merchant…"/>`
+  });
+}
+function pageCreatorApps(){
+  $("#pageTitle").textContent = "Influencer Approvals";
+  $("#pageSub").textContent = "Review influencer applications";
+  const rows = state.data.creatorApps.map(a => tr([
+    a.id,a.creator,a.submitted,a.social,
+    chip(a.status.toUpperCase(), statusKind(a.status)),
+    `<div class="actions">
+      <div class="iconBtn" onclick="openCreatorApp('${a.id}')">👁</div>
+      <div class="iconBtn" onclick="quickApprove('creator','${a.id}')">✅</div>
+      <div class="iconBtn" onclick="quickReject('creator','${a.id}')">❌</div>
+    </div>`
+  ]));
+  return tableCard({
+    title:"Influencer applications",
+    subtitle:"Pending → Approved / Rejected",
+    cols:["App ID","Creator","Submitted","Social","Status","Actions"],
+    rows,
+    filtersHtml:`<select class="select"><option>All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select><input class="input" placeholder="Search creator…"/>`
+  });
+}
+function pageTopups(){
+  $("#pageTitle").textContent = "Wallet Top-Ups";
+  $("#pageSub").textContent = "Manual proof validation & crediting";
+  const rows = state.data.topups.map(t => tr([
+    t.id,t.merchant,money(t.amount),t.ref,t.submitted,
+    chip(t.status.toUpperCase(), statusKind(t.status)),
+    t.proof ? chip("PROOF","info") : chip("MISSING","bad"),
+    `<div class="actions">
+      <div class="iconBtn" onclick="openTopup('${t.id}')">👁</div>
+      <div class="iconBtn" onclick="confirmTopup('${t.id}')">✅</div>
+      <div class="iconBtn" onclick="rejectTopup('${t.id}')">❌</div>
+    </div>`
+  ]));
+  return tableCard({
+    title:"Top-up requests",
+    subtitle:"Pending → Confirmed / Rejected",
+    cols:["Top-up ID","Merchant","Amount","Reference","Submitted","Status","Proof","Actions"],
+    rows,
+    filtersHtml:`<select class="select"><option>All statuses</option><option>Pending</option><option>Confirmed</option><option>Rejected</option></select><input class="input" placeholder="Search ref…"/>`
+  });
+}
+function pageRefunds(){
+  $("#pageTitle").textContent = "Refund Requests";
+  $("#pageSub").textContent = "Unused merchant balance refunds";
+  const rows = state.data.refunds.map(r => tr([
+    r.id,r.merchant,money(r.amount),r.reason,r.submitted,
+    chip(r.status.toUpperCase(), statusKind(r.status)),
+    `<div class="actions">
+      <div class="iconBtn" onclick="openRefund('${r.id}')">👁</div>
+      <div class="iconBtn" onclick="approveRefund('${r.id}')">✅</div>
+      <div class="iconBtn" onclick="markRefundPaid('${r.id}')">💸</div>
+      <div class="iconBtn" onclick="rejectRefund('${r.id}')">❌</div>
+    </div>`
+  ]));
+  return tableCard({
+    title:"Refund requests",
+    subtitle:"Pending → Approved → Paid / Rejected",
+    cols:["Refund ID","Merchant","Amount","Reason","Submitted","Status","Actions"],
+    rows
+  });
+}
+function pageMWithdraw(){
+  $("#pageTitle").textContent = "Merchant Withdrawals";
+  $("#pageSub").textContent = "Manual approvals & payouts";
+  const rows = state.data.merchantWithdrawals.map(w => tr([
+    w.id,w.merchant,money(w.amount),w.submitted,
+    chip(w.status.toUpperCase(), statusKind(w.status)),
+    `<div class="actions">
+      <div class="iconBtn" onclick="openMerchantWithdraw('${w.id}')">👁</div>
+      <div class="iconBtn" onclick="approveWithdraw('merchant','${w.id}')">✅</div>
+      <div class="iconBtn" onclick="markPaid('merchant','${w.id}')">💸</div>
+      <div class="iconBtn" onclick="rejectWithdraw('merchant','${w.id}')">❌</div>
+    </div>`
+  ]));
+  return tableCard({
+    title:"Merchant withdrawal requests",
+    subtitle:"Pending → Approved → Paid / Rejected",
+    cols:["Req ID","Merchant","Amount","Submitted","Status","Actions"],
+    rows
+  });
+}
+function pageCWithdraw(){
+  $("#pageTitle").textContent = "Influencer Withdrawals";
+  $("#pageSub").textContent = "Manual approvals & payouts";
+  const rows = state.data.creatorWithdrawals.map(w => tr([
+    w.id,w.creator,money(w.amount),w.submitted,
+    chip(w.status.toUpperCase(), statusKind(w.status)),
+    `<div class="actions">
+      <div class="iconBtn" onclick="openCreatorWithdraw('${w.id}')">👁</div>
+      <div class="iconBtn" onclick="approveWithdraw('creator','${w.id}')">✅</div>
+      <div class="iconBtn" onclick="markPaid('creator','${w.id}')">💸</div>
+      <div class="iconBtn" onclick="rejectWithdraw('creator','${w.id}')">❌</div>
+    </div>`
+  ]));
+  return tableCard({
+    title:"Influencer withdrawal requests",
+    subtitle:"Pending → Approved → Paid / Rejected",
+    cols:["Req ID","Influencer","Amount","Submitted","Status","Actions"],
+    rows
+  });
+}
+function pageMerchants(){
+  $("#pageTitle").textContent = "Merchants";
+  $("#pageSub").textContent = "Registry & operational settings";
+  const rows = state.data.merchants.map(m => tr([
+    m.id,m.name,m.owner,m.created,
+    chip("Badge "+m.badge,"info"),
+    chip(m.status.toUpperCase(), statusKind(m.status)),
+    `<div class="actions"><div class="iconBtn" onclick="openMerchant('${m.id}')">👁</div></div>`
+  ]));
+  return tableCard({
+    title:"Merchants registry",
+    subtitle:"View merchant status and badge",
+    cols:["Merchant ID","Name","Owner","Created","Badge","Status","Actions"],
+    rows
+  });
+}
+function pageNotifications(){
+  $("#pageTitle").textContent = "Notifications";
+  $("#pageSub").textContent = "In-app + Push (FCM)";
+  const rows = state.data.notifications.map(n => tr([
+    n.id,n.title,n.channel,n.audience,n.created,
+    chip(n.status.toUpperCase(), statusKind(n.status)),
+    `<div class="actions"><div class="iconBtn" onclick="openNotification('${n.id}')">👁</div></div>`
+  ]));
+  return tableCard({
+    title:"Sent notifications",
+    subtitle:"MVP excludes Email/SMS",
+    cols:["ID","Title","Channel","Audience","Created","Status","Actions"],
+    rows
+  });
+}
+function pageLogs(){
+  $("#pageTitle").textContent = "Logs";
+  $("#pageSub").textContent = "Structured logs (INFO/ERROR)";
+  const rows = state.data.logs.map(l => tr([
+    l.t,
+    chip(l.level, l.level==="ERROR"?"bad":"info"),
+    `<span style="font-weight:900">${l.msg}</span>`,
+    `<div class="actions"><div class="iconBtn" onclick="openDrawer({title:'Log', sub:'Event', body:'<div class=\'card\' style=\'box-shadow:none;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.08)\'><div style=\'font-weight:1100\'>Message</div><div style=\'color:var(--muted);margin-top:6px\'>${l.msg}</div></div>', actions:'<button class=\'btn secondary\' onclick=\'closeDrawer()\'>Close</button>'})">👁</div></div>`
+  ]));
+  return tableCard({title:"Application logs", subtitle:"Focus on state transitions", cols:["Timestamp","Level","Message",""], rows});
+}
+function pageSettings(){
+  $("#pageTitle").textContent = "Settings";
+  $("#pageSub").textContent = "Environment, rounding, integrations";
+  return `
+    <div class="grid">
+      <div class="card" style="grid-column: span 6;">
+        <div style="font-weight:1100">Environment</div>
+        <div style="color:var(--muted); font-size:13px; margin-top:6px">DEV / PROD</div>
+        <div style="margin-top:10px">${chip("DEV","info")} ${chip("PROD","info")}</div>
+      </div>
+      <div class="card" style="grid-column: span 6;">
+        <div style="font-weight:1100">Crash reporting</div>
+        <div style="color:var(--muted); font-size:13px; margin-top:6px">Sentry enabled (backend + web + mobile)</div>
+        <div style="margin-top:10px">${chip("Sentry","ok")} ${chip("Release tracking","info")}</div>
+      </div>
+      <div class="card" style="grid-column: span 12;">
+        <div style="font-weight:1100">Rounding rule</div>
+        <div style="color:var(--muted); font-size:13px; margin-top:6px">ROUND_HALF_UP • money 2 decimals • points whole numbers</div>
+      </div>
+    </div>
+  `;
+}
+
+/* Routing + render */
+const menuItems = [
+  {k:"dash", t:"Dashboard", i:"📊"},
+  {k:"merchantApps", t:"Merchant Approvals", i:"🏪"},
+  {k:"creatorApps", t:"Influencer Approvals", i:"🎯"},
+  {k:"topups", t:"Wallet Top-Ups", i:"💰"},
+  {k:"refunds", t:"Refund Requests", i:"↩️"},
+  {k:"mWithdraw", t:"Merchant Withdrawals", i:"🏦"},
+  {k:"cWithdraw", t:"Influencer Withdrawals", i:"🏧"},
+  {k:"merchants", t:"Merchants", i:"🧾"},
+  {k:"notifications", t:"Notifications", i:"🔔"},
+  {k:"logs", t:"Logs", i:"🧱"},
+  {k:"settings", t:"Settings", i:"⚙️"},
+];
+function setPage(k){ state.page=k; render(); }
+function renderMenu(){
+  $("#menu").innerHTML = menuItems.map(x => `
+    <div class="mi ${state.page===x.k?'active':''}" onclick="setPage('${x.k}')">
+      <div class="ico">${x.i}</div>
+      <div>${x.t}</div>
+    </div>
+  `).join("");
+}
+function render(){
+  renderMenu();
+  let html="";
+  switch(state.page){
+    case "dash": html=pageDash(); break;
+    case "merchantApps": html=pageMerchantApps(); break;
+    case "creatorApps": html=pageCreatorApps(); break;
+    case "topups": html=pageTopups(); break;
+    case "refunds": html=pageRefunds(); break;
+    case "mWithdraw": html=pageMWithdraw(); break;
+    case "cWithdraw": html=pageCWithdraw(); break;
+    case "merchants": html=pageMerchants(); break;
+    case "notifications": html=pageNotifications(); break;
+    case "logs": html=pageLogs(); break;
+    case "settings": html=pageSettings(); break;
+    default: html=pageDash();
+  }
+  $("#page").innerHTML = html;
+}
+render();
+</script>
+</body>
+</html>
