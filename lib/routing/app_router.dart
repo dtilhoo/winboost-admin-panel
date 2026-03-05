@@ -15,6 +15,9 @@ import '../features/audit_logs/audit_logs_view.dart';
 import '../features/settings/settings_view.dart';
 import '../features/auth/login_view.dart';
 import '../features/auth/cubit/auth_cubit.dart';
+import '../features/user_management/user_management_view.dart';
+import '../features/bizboost_campaigns/bizboost_campaigns_view.dart';
+import '../features/treasury/treasury_view.dart';
 import '../core/widgets/sidebar.dart';
 import '../core/theme/app_colors.dart';
 import '../injection/injection.dart';
@@ -213,6 +216,30 @@ final goRouter = GoRouter(
             context: context,
             state: state,
             child: const SettingsView(),
+          ),
+        ),
+        GoRoute(
+          path: '/users',
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: const UserManagementView(),
+          ),
+        ),
+        GoRoute(
+          path: '/campaigns',
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: const BizboostCampaignsView(),
+          ),
+        ),
+        GoRoute(
+          path: '/treasury',
+          pageBuilder: (context, state) => buildPageWithDefaultTransition(
+            context: context,
+            state: state,
+            child: const TreasuryView(),
           ),
         ),
       ],

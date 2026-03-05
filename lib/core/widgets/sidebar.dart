@@ -125,6 +125,30 @@ class Sidebar extends StatelessWidget {
                   ).matchedLocation.startsWith('/logs'),
                 ),
                 _MenuItem(
+                  title: 'Users & Badges',
+                  icon: Icons.people_outline,
+                  route: '/users',
+                  isActive: GoRouterState.of(
+                    context,
+                  ).matchedLocation.startsWith('/users'),
+                ),
+                _MenuItem(
+                  title: 'BizBoost Campaigns',
+                  icon: Icons.rocket_launch_outlined,
+                  route: '/campaigns',
+                  isActive: GoRouterState.of(
+                    context,
+                  ).matchedLocation.startsWith('/campaigns'),
+                ),
+                _MenuItem(
+                  title: 'Treasury',
+                  icon: Icons.account_balance_outlined,
+                  route: '/treasury',
+                  isActive: GoRouterState.of(
+                    context,
+                  ).matchedLocation.startsWith('/treasury'),
+                ),
+                _MenuItem(
                   title: 'Settings',
                   icon: Icons.settings_outlined,
                   route: '/settings',
